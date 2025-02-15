@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
+
 import '../model/song.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,7 +12,7 @@ abstract interface class DataSource {
 class RemoteDataSource implements DataSource {
   @override
   Future<List<Song>?> loadData() async {
-    const url = "https://thantrieu.com/resources/braniumapis/songs.json";
+    const url = "https://thantrieu.com/resources/braniumapis/songs.js66on";
     final uri = Uri.parse(url);
     final response = await http.get(uri);
     if (response.statusCode == 200) {
@@ -29,8 +31,11 @@ class RemoteDataSource implements DataSource {
 
 class LocalDataSource implements DataSource {
   @override
-  Future<List<Song>?> loadData() {
-    // TODO: implement loadData
-    throw UnimplementedError();
+  Future<List<Song>?> loadData() async {
+    final String response = await rootBundle.loadString('assets/songs.json');
+    final jsonBody = jsonDecode(response) as Map;
+    final songList = jsonBody["songs"] as List;
+    List<Song> songs = songList.map((song) => Song.fromJson(song)).toList();
+    return songs;
   }
 }
